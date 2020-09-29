@@ -629,6 +629,12 @@ class Project(object):
         self._add_package_data(package_name, filename)
 
     def include_directory(self, package_path, patterns_list, package_root=""):
+        """
+        Specify package data using wildcards. Note: package data has to be placed within the package directory, i.e. my_pkg/resource/data/file1 for package "my_pkg".
+        @param package_path: relative to project base directory. e.g. src/main/python/my_pkg for a package "my_pkg" located under src/main/python
+        @param patterns_list: patterns to apply. Note that package data has to be located within the package in order for this function to work. e.g. use "resource/data/*.txt" to match all text files for my_pkg.
+        @param package_root DO NOT specify because this is confusing with the package_path. In theory, we can change the first variable to package_name, then package_root is the path of the package relative to the project base directory.
+        """
         if not package_path or package_path.strip() == "":
             raise ValueError("Missing argument package_path.")
 
