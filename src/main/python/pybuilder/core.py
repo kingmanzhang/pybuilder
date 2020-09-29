@@ -24,7 +24,7 @@
 import fnmatch
 import os
 import string
-from os.path import isdir, isfile, basename, relpath, sep
+from os.path import isdir, isfile, basename, sep
 
 import itertools
 import logging
@@ -642,12 +642,14 @@ class Project(object):
         package_full_path = self.expand_path(package_root, package_path)
 
         for root, dirnames, filenames in os.walk(package_full_path):
-            filenames = list(fnmatch.filter(filenames, pattern) for pattern in patterns_list)
+            filenames_abs = [jp(root, filename) for filename in filenames]
+            if not package_full_path.endswith(sep):
+                package_full_path += sep
+            filenames_rel = [filename_abs[len(package_full_path):] for filename_abs in filenames_abs]
+            filenames = list(fnmatch.filter(filenames_rel, pattern) for pattern in patterns_list)
 
             for filename in itertools.chain.from_iterable(filenames):
-                full_path = np(jp(root, filename))
-                relative_path = relpath(full_path, package_full_path)
-                self._add_package_data(package_name, relative_path)
+                self._add_package_data(package_name, filename)
 
     def _add_package_data(self, package_name, filename):
         filename = filename.replace("\\", "/")
